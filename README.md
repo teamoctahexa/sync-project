@@ -48,10 +48,12 @@ Sync-project is a lightweight bash script that simplifies the deployment process
    ```bash
    ssh-keygen -t rsa -b 4096
    ```
-2. Copy your public key to the server:
+2. Copy your public key to the server (use the site-user, not root):
    ```bash
-   ssh-copy-id user@server
+   ssh-copy-id site-user@server
    ```
+   
+   > **Important:** Always use the site-user (the user who owns your web files) rather than root for SSH key exchange. This ensures proper ownership and permissions for your files when syncing. Using root can lead to permission issues that prevent your web application from functioning correctly.
 
 ### Alternative: Password Authentication (not recommended)
 
@@ -83,7 +85,7 @@ Sync-project is a lightweight bash script that simplifies the deployment process
 
 ### Exclusions
 
-The script includes common exclusions by default. You can modify the EXCLUSIONS array in the script to add or remove items:
+The script includes common exclusions by default and also uses your project's .gitignore file to determine additional exclusions. You can modify the EXCLUSIONS array in the script to add or remove items:
 
 ```bash
 EXCLUSIONS=(
@@ -99,6 +101,8 @@ EXCLUSIONS=(
     "--exclude=sync-project.sh"
 )
 ```
+
+> **Important:** Ensure your project has a .gitignore file in the root directory. The script automatically uses this file to make additional exclusions, preventing unnecessary files from being transferred to your server.
 
 ## 📚 Examples
 

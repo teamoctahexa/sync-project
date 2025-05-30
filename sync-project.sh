@@ -2,7 +2,7 @@
 #
 # ==============================================================================
 # File:               sync-project.sh
-# Version:            1.2.0
+# Version:            1.2.1
 # Description:        Universal sync tool for WordPress themes/plugins with backup system
 # Author:             OctaHexa (https://octahexa.com)
 # GitHub:             https://github.com/teamoctahexa/sync-project
@@ -25,7 +25,8 @@
 #
 #   1. SSH Key Authentication (Recommended):
 #      - Generate keys: ssh-keygen -t rsa -b 4096
-#      - Copy to server: ssh-copy-id user@server
+#      - Copy to server: ssh-copy-id site-user@server (use site-user, NOT root)
+#      - IMPORTANT: Always use the site-user who owns the web files to avoid permission issues
 #      - No password needed after setup
 #
 #   2. Password Authentication:
@@ -35,9 +36,10 @@
 #
 # Setup Instructions:
 #   1. Copy this script to the ROOT of your project directory (same level as your main files)
-#   2. Edit the SERVER_DETAILS section below with your credentials
-#   3. Make executable: chmod +x sync-project.sh
-#   4. Run: ./sync-project.sh
+#   2. Ensure you have a .gitignore file in your project root (the script uses it for additional exclusions)
+#   3. Edit the SERVER_DETAILS section below with your credentials
+#   4. Make executable: chmod +x sync-project.sh
+#   5. Run: ./sync-project.sh
 #
 # SECURITY NOTES:
 #   - This script is automatically excluded from syncing to protect your credentials
@@ -56,11 +58,11 @@
 
 # Server connection details
 SERVER_IP="xxx.xxx.xxx.xxx"          # Server IP or hostname
-SERVER_USER="your-ssh-user"    # SSH username
+SERVER_USER="site-user"              # SSH username of the site-user (usually not root)
 
 # Project destination details
 PROJECT_TYPE="plugin"              # Options: plugin, theme, custom
-DEST_DIR="/home/your-user/htdocs/example.com/wp-content"
+DEST_DIR="/home/site-user/htdocs/example.com/wp-content"
 
 # For custom projects, set the full destination path
 CUSTOM_DEST_DIR=""                # Only used if PROJECT_TYPE="custom"
@@ -265,6 +267,7 @@ if [ "$DRY_RUN" = "" ]; then
 fi
 
 # Define exclusions - using pattern format that works with rsync
+# Default exclusions plus integration with project's .gitignore file
 EXCLUSIONS=(
     "--exclude=.git"
     "--exclude=.gitignore"
@@ -277,6 +280,7 @@ EXCLUSIONS=(
     "--exclude=tests"
     "--exclude=sync-project.sh"
     "--exclude=sync-plugin.sh"
+    "--exclude-from=.gitignore"  # Uses your project's .gitignore for additional exclusions
     "--exclude=.DS_Store"
     "--exclude=.AppleDouble"
     "--exclude=.LSOverride"
