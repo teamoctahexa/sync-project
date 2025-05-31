@@ -91,6 +91,14 @@ MAX_BACKUP_AGE_DAYS=30
 BACKUP_EXCLUDES=("*.git*" "*/.git/*" "node_modules/*" "backups/*" "vendor/*" "*.zip" "*.log" "tests/")
 
 # ========================================
+# Feature Configuration - Edit these settings
+# ========================================
+
+# Set to true to automatically include .gitignore exclusions
+# Set to false to use only the hardcoded exclusions
+USE_GITIGNORE_EXCLUSIONS=true
+
+# ========================================
 # Command line argument processing
 # ========================================
 
@@ -267,7 +275,7 @@ if [ "$DRY_RUN" = "" ]; then
 fi
 
 # Define exclusions - using pattern format that works with rsync
-# Default exclusions plus integration with project's .gitignore file
+# Default exclusions with optional integration with project's .gitignore file
 EXCLUSIONS=(
     "--exclude=.git"
     "--exclude=.gitignore"
@@ -280,7 +288,6 @@ EXCLUSIONS=(
     "--exclude=tests"
     "--exclude=sync-project.sh"
     "--exclude=sync-plugin.sh"
-    "--exclude-from=.gitignore"  # Uses your project's .gitignore for additional exclusions
     "--exclude=.DS_Store"
     "--exclude=.AppleDouble"
     "--exclude=.LSOverride"
@@ -299,6 +306,14 @@ EXCLUSIONS=(
     "--exclude='Temporary Items'"
     "--exclude=.apdisk"
 )
+
+# Conditionally include .gitignore exclusions based on configuration
+if [ "$USE_GITIGNORE_EXCLUSIONS" = true ]; then
+    EXCLUSIONS+=("--exclude-from=.gitignore")
+    echo "Using .gitignore exclusions"
+else
+    echo "Using only hardcoded exclusions (ignoring .gitignore)"
+fi
 
 # Sync only changed files using rsync
 echo -e "\nSyncing files..."
