@@ -305,6 +305,7 @@ EXCLUSIONS=(
     "--exclude='Network Trash Folder'"
     "--exclude='Temporary Items'"
     "--exclude=.apdisk"
+    "--exclude=.claude"
 )
 
 # Conditionally include .gitignore exclusions based on configuration
